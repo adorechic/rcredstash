@@ -1,0 +1,2 @@
+module CredStash
+end

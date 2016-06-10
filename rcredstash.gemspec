@@ -1,11 +1,11 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'rcredstash/version'
+require 'cred_stash/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "rcredstash"
-  spec.version       = Rcredstash::VERSION
+  spec.version       = CredStash::VERSION
   spec.authors       = ["adorechic"]
   spec.email         = ["adorechic@gmail.com"]
 
