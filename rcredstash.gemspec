@@ -8,6 +8,7 @@ Gem::Specification.new do |spec|
   spec.version       = CredStash::VERSION
   spec.authors       = ["adorechic"]
   spec.email         = ["adorechic@gmail.com"]
+  spec.homepage      = 'https://github.com/adorechic/rcredstash'
 
   spec.summary       = %q{A Ruby port of CredStash}
   spec.description   = %q{A Ruby port of CredStash}
