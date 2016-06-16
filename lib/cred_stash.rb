@@ -65,4 +65,14 @@ module CredStash
       expression_attribute_names: { "#name" => "name" },
     )
   end
+
+  def self.list
+    dynamodb = Aws::DynamoDB::Client.new
+    res = dynamodb.scan(
+      table_name:  'credential-store',
+      projection_expression: '#name, version',
+      expression_attribute_names: { "#name" => "name" },
+    )
+    res.items.inject({}) {|h, i| h[i['name']] = i['version']; h }
+  end
 end
