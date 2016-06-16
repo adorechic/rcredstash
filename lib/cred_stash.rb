@@ -100,6 +100,8 @@ module CredStash
       )
     end
 
+    private
+
     def get_highest_version(name)
       dynamodb = Aws::DynamoDB::Client.new
       res = dynamodb.query(
