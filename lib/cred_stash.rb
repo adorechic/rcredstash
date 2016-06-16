@@ -1,4 +1,5 @@
 require 'aws-sdk'
+
 module CredStash
   def self.get(name)
     dynamodb = Aws::DynamoDB::Client.new
@@ -32,5 +33,36 @@ module CredStash
     cipher.iv = %w(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1).map(&:hex).pack('C' * 16)
     value = cipher.update(contents) + cipher.final
     value.force_encoding("UTF-8")
+  end
+
+  def self.put(name, value)
+    kms = Aws::KMS::Client.new
+    kms_res = kms.generate_data_key(key_id: 'alias/credstash', number_of_bytes: 64)
+    data_key = kms_res.plaintext[0..32]
+    hmac_key = kms_res.plaintext[32..-1]
+    wrapped_key = kms_res.ciphertext_blob
+
+    cipher = OpenSSL::Cipher::AES.new(256, "CTR")
+    cipher.encrypt
+    cipher.key = data_key
+    # FIXME It is better to generate and store initial counter
+    cipher.iv = %w(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1).map(&:hex).pack('C' * 16)
+    contents = cipher.update(value) + cipher.final
+
+    hmac = OpenSSL::HMAC.hexdigest("sha256", hmac_key, contents)
+
+    dynamodb = Aws::DynamoDB::Client.new
+    dynamodb.put_item(
+      table_name:  'credential-store',
+      item: {
+        name: name,
+        version: "%019d" % 1, # TODO Check previous highest version
+        key: Base64.encode64(wrapped_key),
+        contents: Base64.encode64(contents),
+        hmac: hmac
+      },
+      condition_expression: "attribute_not_exists(#name)",
+      expression_attribute_names: { "#name" => "name" },
+    )
   end
 end
