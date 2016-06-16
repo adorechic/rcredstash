@@ -51,12 +51,14 @@ module CredStash
 
     hmac = OpenSSL::HMAC.hexdigest("sha256", hmac_key, contents)
 
+    version = get_highest_version(name) + 1
+
     dynamodb = Aws::DynamoDB::Client.new
     dynamodb.put_item(
       table_name:  'credential-store',
       item: {
         name: name,
-        version: "%019d" % 1, # TODO Check previous highest version
+        version: "%019d" % version,
         key: Base64.encode64(wrapped_key),
         contents: Base64.encode64(contents),
         hmac: hmac
@@ -95,5 +97,27 @@ module CredStash
         version: item['version'],
       }
     )
+  end
+
+  def self.get_highest_version(name)
+    dynamodb = Aws::DynamoDB::Client.new
+    res = dynamodb.query(
+      table_name:  'credential-store',
+      limit: 1,
+      consistent_read: true,
+      scan_index_forward: false,
+      key_condition_expression: "#name = :name",
+      expression_attribute_names: { "#name" => "name"},
+      expression_attribute_values: { ":name" => name },
+      projection_expression: 'version',
+    )
+
+    item = res.items.first
+
+    if item
+      item['version'].to_i
+    else
+      0
+    end
   end
 end
