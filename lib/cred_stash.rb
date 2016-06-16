@@ -6,7 +6,7 @@ module CredStash
       table_name:  'credential-store',
       limit: 1,
       consistent_read: true,
-      scan_index_forward: true,
+      scan_index_forward: false,
       key_condition_expression: "#name = :name",
       expression_attribute_names: { "#name" => "name"},
       expression_attribute_values: { ":name" => name }
