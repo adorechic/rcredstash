@@ -75,4 +75,25 @@ module CredStash
     )
     res.items.inject({}) {|h, i| h[i['name']] = i['version']; h }
   end
+
+  def self.delete(name)
+    dynamodb = Aws::DynamoDB::Client.new
+    res = dynamodb.query(
+      table_name:  'credential-store',
+      consistent_read: true,
+      key_condition_expression: "#name = :name",
+      expression_attribute_names: { "#name" => "name"},
+      expression_attribute_values: { ":name" => name }
+    )
+    # TODO needs delete target version option
+
+    item = res.items.first
+    dynamodb.delete_item(
+      table_name:  'credential-store',
+      key: {
+        name: item['name'],
+        version: item['version'],
+      }
+    )
+  end
 end
