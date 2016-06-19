@@ -33,19 +33,14 @@ module CredStash
 
       version = get_highest_version(name) + 1
 
-      dynamodb = Aws::DynamoDB::Client.new
-      dynamodb.put_item(
-        table_name:  'credential-store',
-        item: {
-          name: name,
-          version: "%019d" % version,
-          key: Base64.encode64(wrapped_key),
-          contents: Base64.encode64(contents),
-          hmac: hmac
-        },
-        condition_expression: "attribute_not_exists(#name)",
-        expression_attribute_names: { "#name" => "name" },
+      item = Repository::Item.new(
+        name: name,
+        version: "%019d" % version,
+        key: Base64.encode64(wrapped_key),
+        contents: Base64.encode64(contents),
+        hmac: hmac
       )
+      Repository.new.put(item)
     end
 
     def list

@@ -1,10 +1,13 @@
 class CredStash::Repository
   class Item
-    attr_reader :key, :contents
+    attr_reader :key, :contents, :name, :version, :hmac
 
-    def initialize(key:, contents:)
+    def initialize(key:, contents:, name: nil, version: nil, hmac: nil)
       @key = key
       @contents = contents
+      @name = name,
+      @version = version
+      @hmac = hmac
     end
   end
 
@@ -30,6 +33,21 @@ class CredStash::Repository
         raise CredStash::ItemNotFound, "#{name} is not found"
       end
     end
+
+    def put(item)
+      @client.put_item(
+        table_name:  'credential-store',
+        item: {
+          name: item.name,
+          version: item.version,
+          key: item.key,
+          contents: item.contents,
+          hmac: item.hmac
+        },
+        condition_expression: "attribute_not_exists(#name)",
+        expression_attribute_names: { "#name" => "name" },
+      )
+    end
   end
 
   def self.default_storage
@@ -42,5 +60,9 @@ class CredStash::Repository
 
   def get(name)
     @storage.get(name)
+  end
+
+  def put(item)
+    @storage.put(item)
   end
 end

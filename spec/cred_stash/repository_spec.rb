@@ -29,5 +29,36 @@ describe CredStash::Repository do
         end
       end
     end
+
+    describe '#put' do
+      let(:item) do
+        CredStash::Repository::Item.new(
+          name: 'name',
+          version: "%019d" % 1,
+          key: 'base64_encoded_key',
+          contents: 'base64_encoded_contents',
+          hmac: 'hmac'
+        )
+      end
+
+      it 'puts item to DynamoDB' do
+        put_params = {
+          table_name:  'credential-store',
+          item: {
+            name: item.name,
+            version: item.version,
+            key: item.key,
+            contents: item.contents,
+            hmac: item.hmac
+          },
+          condition_expression: "attribute_not_exists(#name)",
+          expression_attribute_names: { "#name" => "name" },
+        }
+
+        stub_client = double
+        expect(stub_client).to receive(:put_item).with(put_params)
+        described_class.new(client: stub_client).put(item)
+      end
+    end
   end
 end
