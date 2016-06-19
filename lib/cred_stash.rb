@@ -27,13 +27,7 @@ module CredStash
         raise "invalid"
       end
 
-      cipher = OpenSSL::Cipher::AES.new(256, "CTR")
-      cipher.decrypt
-      cipher.key = key
-      # FIXME It is better to generate and store initial counter
-      cipher.iv = %w(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1).map(&:hex).pack('C' * 16)
-      value = cipher.update(contents) + cipher.final
-      value.force_encoding("UTF-8")
+      Cipher.new(key).decrypte(contents)
     end
 
     def put(name, value)
@@ -43,12 +37,7 @@ module CredStash
       hmac_key = kms_res.plaintext[32..-1]
       wrapped_key = kms_res.ciphertext_blob
 
-      cipher = OpenSSL::Cipher::AES.new(256, "CTR")
-      cipher.encrypt
-      cipher.key = data_key
-      # FIXME It is better to generate and store initial counter
-      cipher.iv = %w(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1).map(&:hex).pack('C' * 16)
-      contents = cipher.update(value) + cipher.final
+      contents = Cipher.new(data_key).encrypt(value)
 
       hmac = OpenSSL::HMAC.hexdigest("sha256", hmac_key, contents)
 
@@ -125,3 +114,5 @@ module CredStash
     end
   end
 end
+
+require 'cred_stash/cipher'
