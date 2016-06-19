@@ -24,7 +24,11 @@ class CredStash::Repository
         expression_attribute_values: { ":name" => name }
       )
       material = res.items.first
-      Item.new(key: material["key"], contents: material["contents"])
+      if material
+        Item.new(key: material["key"], contents: material["contents"])
+      else
+        raise CredStash::ItemNotFound, "#{name} is not found"
+      end
     end
   end
 

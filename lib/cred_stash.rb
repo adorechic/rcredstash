@@ -106,4 +106,5 @@ module CredStash
 end
 
 require 'cred_stash/cipher'
+require 'cred_stash/error'
 require 'cred_stash/repository'
