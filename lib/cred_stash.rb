@@ -44,13 +44,7 @@ module CredStash
     end
 
     def list
-      dynamodb = Aws::DynamoDB::Client.new
-      res = dynamodb.scan(
-        table_name:  'credential-store',
-        projection_expression: '#name, version',
-        expression_attribute_names: { "#name" => "name" },
-      )
-      res.items.inject({}) {|h, i| h[i['name']] = i['version']; h }
+      Repository.new.list.inject({}) {|h, item| h[item.name] = item.version; h }
     end
 
     def delete(name)

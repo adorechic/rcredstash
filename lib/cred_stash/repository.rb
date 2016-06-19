@@ -2,10 +2,10 @@ class CredStash::Repository
   class Item
     attr_reader :key, :contents, :name, :version, :hmac
 
-    def initialize(key:, contents:, name: nil, version: nil, hmac: nil)
+    def initialize(key: nil, contents: nil, name: nil, version: nil, hmac: nil)
       @key = key
       @contents = contents
-      @name = name,
+      @name = name
       @version = version
       @hmac = hmac
     end
@@ -47,6 +47,16 @@ class CredStash::Repository
         condition_expression: "attribute_not_exists(#name)",
         expression_attribute_names: { "#name" => "name" },
       )
+    end
+
+    def list
+      @client.scan(
+        table_name:  'credential-store',
+        projection_expression: '#name, version',
+        expression_attribute_names: { "#name" => "name" },
+      ).items.map do |item|
+        Item.new(name: item['name'], version: item['version'])
+      end
     end
   end
 
