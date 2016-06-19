@@ -3,19 +3,9 @@ require 'aws-sdk'
 module CredStash
   class << self
     def get(name)
-      dynamodb = Aws::DynamoDB::Client.new
-      res = dynamodb.query(
-        table_name:  'credential-store',
-        limit: 1,
-        consistent_read: true,
-        scan_index_forward: false,
-        key_condition_expression: "#name = :name",
-        expression_attribute_names: { "#name" => "name"},
-        expression_attribute_values: { ":name" => name }
-      )
-      material = res.items.first
-      data = Base64.decode64(material["key"])
-      contents = Base64.decode64(material["contents"])
+      item = Repository.new.get(name)
+      data = Base64.decode64(item.key)
+      contents = Base64.decode64(item.contents)
 
       kms = Aws::KMS::Client.new
       kms_res = kms.decrypt(ciphertext_blob: data)
@@ -116,3 +106,4 @@ module CredStash
 end
 
 require 'cred_stash/cipher'
+require 'cred_stash/repository'
