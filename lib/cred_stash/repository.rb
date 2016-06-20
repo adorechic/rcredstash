@@ -72,6 +72,16 @@ class CredStash::Repository
         Item.new(name: item['name'], version: item['version'])
       end
     end
+
+    def delete(item)
+      @client.delete_item(
+        table_name:  'credential-store',
+        key: {
+          name: item.name,
+          version: item.version
+        }
+      )
+    end
   end
 
   def self.default_storage

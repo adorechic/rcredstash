@@ -99,5 +99,23 @@ describe CredStash::Repository do
         expect(items.first.name).to eq 'name'
       end
     end
+
+    describe '#delete' do
+      let(:item) do
+        CredStash::Repository::Item.new(name: 'name', version: '0001')
+      end
+
+      it 'deletes from DynamoDB' do
+        stub_client = double
+        expect(stub_client).to receive(:delete_item).with(
+                                 table_name:  'credential-store',
+                                 key: {
+                                   name: 'name',
+                                   version: '0001'
+                                 }
+                               )
+        described_class.new(client: stub_client).delete(item)
+      end
+    end
   end
 end

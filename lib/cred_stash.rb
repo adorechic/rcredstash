@@ -49,14 +49,9 @@ module CredStash
 
     def delete(name)
       # TODO needs delete target version option
-      item = Repository.new.select(name).first
-      dynamodb.delete_item(
-        table_name:  'credential-store',
-        key: {
-          name: item.name,
-          version: item.version
-        }
-      )
+      repository = Repository.new
+      item = repository.select(name).first
+      repository.delete(item)
     end
 
     private
