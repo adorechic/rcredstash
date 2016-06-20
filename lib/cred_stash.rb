@@ -21,22 +21,18 @@ module CredStash
     end
 
     def put(name, value)
-      kms = Aws::KMS::Client.new
-      kms_res = kms.generate_data_key(key_id: 'alias/credstash', number_of_bytes: 64)
-      data_key = kms_res.plaintext[0..32]
-      hmac_key = kms_res.plaintext[32..-1]
-      wrapped_key = kms_res.ciphertext_blob
+      key = CipherKey.generate
 
-      contents = Cipher.new(data_key).encrypt(value)
+      contents = Cipher.new(key.data_key).encrypt(value)
 
-      hmac = OpenSSL::HMAC.hexdigest("sha256", hmac_key, contents)
+      hmac = OpenSSL::HMAC.hexdigest("sha256", key.hmac_key, contents)
 
       version = get_highest_version(name) + 1
 
       item = Repository::Item.new(
         name: name,
         version: "%019d" % version,
-        key: Base64.encode64(wrapped_key),
+        key: Base64.encode64(key.wrapped_key),
         contents: Base64.encode64(contents),
         hmac: hmac
       )
@@ -67,6 +63,7 @@ module CredStash
   end
 end
 
+require 'cred_stash/cipher_key'
 require 'cred_stash/cipher'
 require 'cred_stash/error'
 require 'cred_stash/repository'
