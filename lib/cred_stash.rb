@@ -7,17 +7,13 @@ module CredStash
       data = Base64.decode64(item.key)
       contents = Base64.decode64(item.contents)
 
-      kms = Aws::KMS::Client.new
-      kms_res = kms.decrypt(ciphertext_blob: data)
+      key = CipherKey.decrypt(data)
 
-      key = kms_res.plaintext[0..32]
-      hmackey = kms_res.plaintext[32..-1]
-
-      unless OpenSSL::HMAC.hexdigest("sha256", hmackey, contents) == material["hmac"]
+      unless OpenSSL::HMAC.hexdigest("sha256", key.hmac_key, contents) == material["hmac"]
         raise "invalid"
       end
 
-      Cipher.new(key).decrypte(contents)
+      Cipher.new(key.data_key).decrypte(contents)
     end
 
     def put(name, value)
