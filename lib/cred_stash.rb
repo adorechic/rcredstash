@@ -13,13 +13,13 @@ module CredStash
         raise "invalid"
       end
 
-      Cipher.new(key.data_key).decrypte(contents)
+      key.decrypt(contents)
     end
 
     def put(name, value)
       key = CipherKey.generate
 
-      contents = Cipher.new(key.data_key).encrypt(value)
+      contents = key.encrypt(value)
 
       version = get_highest_version(name) + 1
 

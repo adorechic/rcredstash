@@ -28,4 +28,12 @@ class CredStash::CipherKey
   def hmac(message)
     OpenSSL::HMAC.hexdigest("SHA256", hmac_key, message)
   end
+
+  def encrypt(message)
+    CredStash::Cipher.new(data_key).encrypt(message)
+  end
+
+  def decrypt(message)
+    CredStash::Cipher.new(data_key).decrypt(message)
+  end
 end
