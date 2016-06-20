@@ -9,7 +9,7 @@ module CredStash
 
       key = CipherKey.decrypt(wrapped_key)
 
-      unless OpenSSL::HMAC.hexdigest("sha256", key.hmac_key, contents) == material["hmac"]
+      unless OpenSSL::HMAC.hexdigest("sha256", key.hmac_key, contents) == item.hmac
         raise "invalid"
       end
 
