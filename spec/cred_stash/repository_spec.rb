@@ -81,5 +81,23 @@ describe CredStash::Repository do
         expect(item.version).to eq '0000001'
       end
     end
+
+    describe '#select' do
+      let(:stub_client) do
+        Aws::DynamoDB::Client.new(
+          stub_responses: { query: { items: items } }
+        )
+      end
+
+      let(:items) do
+        [{ 'name' => 'name', 'version' => 'version' }]
+      end
+
+      it 'returns item' do
+        items = described_class.new(client: stub_client).select('name')
+        expect(items.size).to eq 1
+        expect(items.first.name).to eq 'name'
+      end
+    end
   end
 end

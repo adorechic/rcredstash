@@ -17,20 +17,34 @@ class CredStash::Repository
     end
 
     def get(name)
-      res = @client.query(
+      select(name, limit: 1).first.tap do |item|
+        unless item
+          raise CredStash::ItemNotFound, "#{name} is not found"
+        end
+      end
+    end
+
+    def select(name, limit: nil)
+      params = {
         table_name:  'credential-store',
-        limit: 1,
         consistent_read: true,
-        scan_index_forward: false,
         key_condition_expression: "#name = :name",
         expression_attribute_names: { "#name" => "name"},
         expression_attribute_values: { ":name" => name }
-      )
-      material = res.items.first
-      if material
-        Item.new(key: material["key"], contents: material["contents"])
-      else
-        raise CredStash::ItemNotFound, "#{name} is not found"
+      }
+
+      if limit
+        params[:limit] = limit
+        params[:scan_index_forward] = false
+      end
+
+      @client.query(params).items.map do |item|
+        Item.new(
+          key: item["key"],
+          contents: item["contents"],
+          name: item["name"],
+          version: item["version"]
+        )
       end
     end
 
