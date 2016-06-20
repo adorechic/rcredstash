@@ -4,10 +4,10 @@ module CredStash
   class << self
     def get(name)
       item = Repository.new.get(name)
-      data = Base64.decode64(item.key)
+      wrapped_key = Base64.decode64(item.key)
       contents = Base64.decode64(item.contents)
 
-      key = CipherKey.decrypt(data)
+      key = CipherKey.decrypt(wrapped_key)
 
       unless OpenSSL::HMAC.hexdigest("sha256", key.hmac_key, contents) == material["hmac"]
         raise "invalid"
