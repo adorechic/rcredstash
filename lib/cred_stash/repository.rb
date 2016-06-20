@@ -24,7 +24,7 @@ class CredStash::Repository
       end
     end
 
-    def select(name, limit: nil)
+    def select(name, pluck: nil, limit: nil)
       params = {
         table_name:  'credential-store',
         consistent_read: true,
@@ -32,6 +32,10 @@ class CredStash::Repository
         expression_attribute_names: { "#name" => "name"},
         expression_attribute_values: { ":name" => name }
       }
+
+      if pluck
+        params[:projection_expression] = pluck
+      end
 
       if limit
         params[:limit] = limit

@@ -57,22 +57,9 @@ module CredStash
     private
 
     def get_highest_version(name)
-      dynamodb = Aws::DynamoDB::Client.new
-      res = dynamodb.query(
-        table_name:  'credential-store',
-        limit: 1,
-        consistent_read: true,
-        scan_index_forward: false,
-        key_condition_expression: "#name = :name",
-        expression_attribute_names: { "#name" => "name"},
-        expression_attribute_values: { ":name" => name },
-        projection_expression: 'version',
-      )
-
-      item = res.items.first
-
+      item = Repository.new.select(name, pluck: 'version', limit: 1).first
       if item
-        item['version'].to_i
+        item.version.to_i
       else
         0
       end
