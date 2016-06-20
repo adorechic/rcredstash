@@ -24,4 +24,8 @@ class CredStash::CipherKey
     @hmac_key = hmac_key
     @wrapped_key = wrapped_key
   end
+
+  def hmac(message)
+    OpenSSL::HMAC.hexdigest("SHA256", hmac_key, message)
+  end
 end

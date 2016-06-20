@@ -9,7 +9,7 @@ module CredStash
 
       key = CipherKey.decrypt(wrapped_key)
 
-      unless OpenSSL::HMAC.hexdigest("sha256", key.hmac_key, contents) == item.hmac
+      unless key.hmac(contents) == item.hmac
         raise "invalid"
       end
 
@@ -21,8 +21,6 @@ module CredStash
 
       contents = Cipher.new(key.data_key).encrypt(value)
 
-      hmac = OpenSSL::HMAC.hexdigest("sha256", key.hmac_key, contents)
-
       version = get_highest_version(name) + 1
 
       item = Repository::Item.new(
@@ -30,7 +28,7 @@ module CredStash
         version: "%019d" % version,
         key: Base64.encode64(key.wrapped_key),
         contents: Base64.encode64(contents),
-        hmac: hmac
+        hmac: key.hmac(contents)
       )
       Repository.new.put(item)
     end

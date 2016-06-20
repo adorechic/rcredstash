@@ -34,4 +34,12 @@ describe CredStash::CipherKey do
       expect(key.wrapped_key).to eq 'ciphertext_blob'
     end
   end
+
+  describe '#hmac' do
+    let(:key) { described_class.new(hmac_key: '0', data_key: '0', wrapped_key: '0') }
+
+    it 'creates HMAC of SHA256' do
+      expect(key.hmac('1')).to eq OpenSSL::HMAC.hexdigest("SHA256", '0', '1')
+    end
+  end
 end
