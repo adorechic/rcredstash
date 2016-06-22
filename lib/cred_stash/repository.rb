@@ -92,7 +92,7 @@ class CredStash::Repository
     DynamoDB.new
   end
 
-  def initialize(storage: Repository.default_storage)
+  def initialize(storage: CredStash::Repository.default_storage)
     @storage = storage
   end
 
@@ -102,5 +102,9 @@ class CredStash::Repository
 
   def put(item)
     @storage.put(item)
+  end
+
+  def select(name, pluck: nil, limit: nil)
+    @storage.select(name, pluck: pluck, limit: limit)
   end
 end

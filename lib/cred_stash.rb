@@ -17,20 +17,9 @@ module CredStash
     end
 
     def put(name, value)
-      key = CipherKey.generate
-
-      contents = key.encrypt(value)
-
-      version = get_highest_version(name) + 1
-
-      item = Repository::Item.new(
-        name: name,
-        version: "%019d" % version,
-        key: Base64.encode64(key.wrapped_key),
-        contents: Base64.encode64(contents),
-        hmac: key.hmac(contents)
-      )
-      Repository.new.put(item)
+      secret = Secret.new(name: name, value: value)
+      secret.encrypt!
+      secret.save
     end
 
     def list
@@ -61,3 +50,4 @@ require 'cred_stash/cipher_key'
 require 'cred_stash/cipher'
 require 'cred_stash/error'
 require 'cred_stash/repository'
+require 'cred_stash/secret'
