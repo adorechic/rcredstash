@@ -3,17 +3,16 @@ require 'aws-sdk'
 module CredStash
   class << self
     def get(name)
-      item = Repository.new.get(name)
-      wrapped_key = Base64.decode64(item.key)
-      contents = Base64.decode64(item.contents)
+      secret = Secret.find(name)
 
-      key = CipherKey.decrypt(wrapped_key)
-
-      unless key.hmac(contents) == item.hmac
-        raise "invalid"
+      if secret.falsified?
+        raise "Invalid secret. #{name} has falsified"
       end
 
-      key.decrypt(contents)
+      secret.decrypted_value
+
+    rescue CredStash::ItemNotFound
+      nil
     end
 
     def put(name, value)

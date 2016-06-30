@@ -1,7 +1,7 @@
 class CredStash::Secret
   attr_reader :name, :value, :key, :encrypted_value, :hmac
 
-  def initialize(name:, value:, key: nil, encrypted_value: nil, hmac: nil)
+  def initialize(name:, value: nil, key: nil, encrypted_value: nil, hmac: nil)
     @name = name
     @value = value
     @key = key
@@ -16,8 +16,33 @@ class CredStash::Secret
   end
 
   def save
-    CredStash::Repository.new.put(to_item)
+    self.class.repository.put(to_item)
   end
+
+  def falsified?
+    @key.hmac(@encrypted_value) == @hmac
+  end
+
+  def decrypted_value
+    @key.decrypt(@encrypted_value)
+  end
+
+  class << self
+    def find(name)
+      item = repository.get(name)
+      new(
+        name: name,
+        key: CredStash::CipherKey.decrypt(Base64.decode64(item.key)),
+        encrypted_value: Base64.decode64(item.contents),
+        hmac: item.hmac
+      )
+    end
+
+    def repository
+      CredStash::Repository.new
+    end
+  end
+
 
   private
 
