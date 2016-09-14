@@ -1,8 +1,7 @@
-# Rcredstash
+# RCredStash
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/rcredstash`. To experiment with that code, run `bin/console` for an interactive prompt.
+RCredStash is a ruby port of [CredStash](https://github.com/fugue/credstash)
 
-TODO: Delete this and the text above, and describe your gem
 
 ## Installation
 
@@ -22,7 +21,15 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+```ruby
+CredStash.get(key)
+CredStash.put(key, value)
+CredStash.list
+CredStash.delete(key)
+```
+
+### AWS configures
+RCredStash uses [aws-sdk v2](https://github.com/aws/aws-sdk-ruby), so configuration options provided by aws-sdk such as `ENV['AWS_ACCESS_KEY_ID']` and `ENV['AWS_SECRET_ACCESS_KEY']` are available.
 
 ## Development
 
@@ -32,10 +39,9 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/rcredstash.
+Bug reports and pull requests are welcome on GitHub at https://github.com/adorechic/rcredstash.
 
 
 ## License
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
-
