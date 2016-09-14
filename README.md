@@ -28,8 +28,16 @@ CredStash.list
 CredStash.delete(key)
 ```
 
-### AWS configures
+### AWS credentials
 RCredStash uses [aws-sdk v2](https://github.com/aws/aws-sdk-ruby), so configuration options provided by aws-sdk such as `ENV['AWS_ACCESS_KEY_ID']` and `ENV['AWS_SECRET_ACCESS_KEY']` are available.
+
+### Configurations
+
+```ruby
+CredStash.configure do |config|
+  config.table_name = 'your_dynamodb_table_name'
+end
+```
 
 ## Development
 

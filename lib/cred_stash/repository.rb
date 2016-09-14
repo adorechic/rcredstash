@@ -26,7 +26,7 @@ class CredStash::Repository
 
     def select(name, pluck: nil, limit: nil)
       params = {
-        table_name:  'credential-store',
+        table_name: CredStash.config.table_name,
         consistent_read: true,
         key_condition_expression: "#name = :name",
         expression_attribute_names: { "#name" => "name"},
@@ -54,7 +54,7 @@ class CredStash::Repository
 
     def put(item)
       @client.put_item(
-        table_name:  'credential-store',
+        table_name: CredStash.config.table_name,
         item: {
           name: item.name,
           version: item.version,
@@ -69,7 +69,7 @@ class CredStash::Repository
 
     def list
       @client.scan(
-        table_name:  'credential-store',
+        table_name: CredStash.config.table_name,
         projection_expression: '#name, version',
         expression_attribute_names: { "#name" => "name" },
       ).items.map do |item|
@@ -79,7 +79,7 @@ class CredStash::Repository
 
     def delete(item)
       @client.delete_item(
-        table_name:  'credential-store',
+        table_name: CredStash.config.table_name,
         key: {
           name: item.name,
           version: item.version

@@ -59,6 +59,37 @@ describe CredStash::Repository do
         expect(stub_client).to receive(:put_item).with(put_params)
         described_class.new(client: stub_client).put(item)
       end
+
+      context 'with table_name option' do
+        before do
+          CredStash.configure do |config|
+            config.table_name = 'awesome_table'
+          end
+        end
+
+        after do
+          CredStash.config.reset!
+        end
+
+        it 'puts item to DynamoDB' do
+          put_params = {
+            table_name: 'awesome_table',
+            item: {
+              name: item.name,
+              version: item.version,
+              key: item.key,
+              contents: item.contents,
+              hmac: item.hmac
+            },
+            condition_expression: "attribute_not_exists(#name)",
+            expression_attribute_names: { "#name" => "name" },
+          }
+
+          stub_client = double
+          expect(stub_client).to receive(:put_item).with(put_params)
+          described_class.new(client: stub_client).put(item)
+        end
+      end
     end
 
     describe '#list' do

@@ -45,6 +45,7 @@ module CredStash
   end
 end
 
+require 'cred_stash/config'
 require 'cred_stash/cipher_key'
 require 'cred_stash/cipher'
 require 'cred_stash/error'
