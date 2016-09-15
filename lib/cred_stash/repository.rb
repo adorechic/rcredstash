@@ -88,23 +88,7 @@ class CredStash::Repository
     end
   end
 
-  def self.default_storage
+  def self.instance
     DynamoDB.new
-  end
-
-  def initialize(storage: CredStash::Repository.default_storage)
-    @storage = storage
-  end
-
-  def get(name)
-    @storage.get(name)
-  end
-
-  def put(item)
-    @storage.put(item)
-  end
-
-  def select(name, pluck: nil, limit: nil)
-    @storage.select(name, pluck: pluck, limit: limit)
   end
 end

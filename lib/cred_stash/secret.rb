@@ -39,7 +39,7 @@ class CredStash::Secret
     end
 
     def repository
-      CredStash::Repository.new
+      CredStash::Repository.instance
     end
   end
 
@@ -57,7 +57,7 @@ class CredStash::Secret
   end
 
   def current_version
-    item = CredStash::Repository.new.select(name, pluck: 'version', limit: 1).first
+    item = CredStash::Repository.instance.select(name, pluck: 'version', limit: 1).first
     if item
       item.version.to_i
     else

@@ -22,12 +22,12 @@ module CredStash
     end
 
     def list
-      Repository.new.list.inject({}) {|h, item| h[item.name] = item.version; h }
+      Repository.instance.list.inject({}) {|h, item| h[item.name] = item.version; h }
     end
 
     def delete(name)
       # TODO needs delete target version option
-      repository = Repository.new
+      repository = Repository.instance
       item = repository.select(name).first
       repository.delete(item)
     end
@@ -35,7 +35,7 @@ module CredStash
     private
 
     def get_highest_version(name)
-      item = Repository.new.select(name, pluck: 'version', limit: 1).first
+      item = Repository.instance.select(name, pluck: 'version', limit: 1).first
       if item
         item.version.to_i
       else

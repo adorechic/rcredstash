@@ -37,7 +37,7 @@ describe CredStash::Secret do
     end
 
     before do
-      allow(CredStash::Repository).to receive(:default_storage).and_return(storage)
+      allow(CredStash::Repository).to receive(:instance).and_return(storage)
     end
 
     it 'saves item' do
