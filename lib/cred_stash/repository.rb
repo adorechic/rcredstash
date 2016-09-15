@@ -1,16 +1,6 @@
+require 'cred_stash/repository/item'
+
 module CredStash::Repository
-  class Item
-    attr_reader :key, :contents, :name, :version, :hmac
-
-    def initialize(key: nil, contents: nil, name: nil, version: nil, hmac: nil)
-      @key = key
-      @contents = contents
-      @name = name
-      @version = version
-      @hmac = hmac
-    end
-  end
-
   class DynamoDB
     def initialize(client: nil)
       @client = client || Aws::DynamoDB::Client.new
