@@ -1,4 +1,4 @@
-class CredStash::Repository
+module CredStash::Repository
   class Item
     attr_reader :key, :contents, :name, :version, :hmac
 
