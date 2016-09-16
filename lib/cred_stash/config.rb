@@ -10,7 +10,7 @@ module CredStash
   end
 
   class Config
-    attr_accessor :table_name
+    attr_accessor :table_name, :storage
 
     def initialize
       reset!
@@ -18,6 +18,7 @@ module CredStash
 
     def reset!
       @table_name = 'credential-store'
+      @storage = :dynamodb
     end
   end
 end
