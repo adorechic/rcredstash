@@ -32,6 +32,10 @@ module CredStash
       repository.delete(item)
     end
 
+    def setup
+      Repository.instance.setup
+    end
+
     private
 
     def get_highest_version(name)
