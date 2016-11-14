@@ -74,5 +74,23 @@ module CredStash::Repository
         }
       )
     end
+
+    def setup
+      @client.create_table(
+        table_name: CredStash.config.table_name,
+        key_schema: [
+          { attribute_name: 'name', key_type: 'HASH' },
+          { attribute_name: 'version', key_type: 'RANGE' },
+        ],
+        attribute_definitions: [
+          { attribute_name: 'name', attribute_type: 'S' },
+          { attribute_name: 'version', attribute_type: 'S' },
+        ],
+        provisioned_throughput: {
+          read_capacity_units: 1,
+          write_capacity_units: 1,
+        },
+      )
+    end
   end
 end
