@@ -23,7 +23,11 @@ Or install it yourself as:
 
 ```ruby
 CredStash.get(key)
+CredStash.get(key, context: { 'foo' => 'bar' })
+
 CredStash.put(key, value)
+CredStash.put(key, value, context: { 'foo' => 'bar' })
+
 CredStash.list
 CredStash.delete(key)
 ```
