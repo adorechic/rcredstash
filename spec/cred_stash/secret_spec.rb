@@ -73,7 +73,7 @@ describe CredStash::Secret do
       end
 
       before do
-        expect(CredStash::CipherKey).to receive(:decrypt).with('key').and_return('decrypt_key')
+        expect(CredStash::CipherKey).to receive(:decrypt).with('key', context: {}).and_return('decrypt_key')
         expect(repository).to receive(:get).and_return(item)
       end
 

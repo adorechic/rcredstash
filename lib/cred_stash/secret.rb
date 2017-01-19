@@ -1,16 +1,17 @@
 class CredStash::Secret
   attr_reader :name, :value, :key, :encrypted_value, :hmac
 
-  def initialize(name:, value: nil, key: nil, encrypted_value: nil, hmac: nil)
+  def initialize(name:, value: nil, key: nil, encrypted_value: nil, hmac: nil, context: {})
     @name = name
     @value = value
     @key = key
     @encrypted_value = encrypted_value
     @hmac = hmac
+    @context = context
   end
 
   def encrypt!
-    @key = CredStash::CipherKey.generate
+    @key = CredStash::CipherKey.generate(context: @context)
     @encrypted_value = @key.encrypt(@value)
     @hmac = @key.hmac(@encrypted_value)
   end
@@ -28,11 +29,11 @@ class CredStash::Secret
   end
 
   class << self
-    def find(name)
+    def find(name, context: {})
       item = repository.get(name)
       new(
         name: name,
-        key: CredStash::CipherKey.decrypt(Base64.decode64(item.key)),
+        key: CredStash::CipherKey.decrypt(Base64.decode64(item.key), context: context),
         encrypted_value: Base64.decode64(item.contents),
         hmac: item.hmac
       )

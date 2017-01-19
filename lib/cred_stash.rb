@@ -2,8 +2,8 @@ require 'aws-sdk'
 
 module CredStash
   class << self
-    def get(name)
-      secret = Secret.find(name)
+    def get(name, context: {})
+      secret = Secret.find(name, context: context)
 
       if secret.falsified?
         raise "Invalid secret. #{name} has falsified"
@@ -15,8 +15,8 @@ module CredStash
       nil
     end
 
-    def put(name, value)
-      secret = Secret.new(name: name, value: value)
+    def put(name, value, context: {})
+      secret = Secret.new(name: name, value: value, context: context)
       secret.encrypt!
       secret.save
     end
