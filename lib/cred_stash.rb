@@ -2,7 +2,7 @@ require 'aws-sdk'
 
 module CredStash
   class << self
-    def get(name, context: {})
+    def get(name, context: {}, raise_if_missing: false)
       secret = Secret.find(name, context: context)
 
       if secret.falsified?
@@ -11,7 +11,8 @@ module CredStash
 
       secret.decrypted_value
 
-    rescue CredStash::ItemNotFound
+    rescue CredStash::ItemNotFound => e
+      raise e if raise_if_missing
       nil
     end
 
