@@ -16,9 +16,9 @@ module CredStash
       nil
     end
 
-    def put(name, value, context: {})
+    def put(name, value, kms_key_id: nil, context: {})
       secret = Secret.new(name: name, value: value, context: context)
-      secret.encrypt!
+      secret.encrypt!(kms_key_id: kms_key_id)
       secret.save
     end
 

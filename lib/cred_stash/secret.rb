@@ -10,8 +10,8 @@ class CredStash::Secret
     @context = context
   end
 
-  def encrypt!
-    @key = CredStash::CipherKey.generate(context: @context)
+  def encrypt!(kms_key_id: nil)
+    @key = CredStash::CipherKey.generate(kms_key_id: kms_key_id, context: @context)
     @encrypted_value = @key.encrypt(@value)
     @hmac = @key.hmac(@encrypted_value)
   end
