@@ -1,9 +1,12 @@
 class CredStash::CipherKey
+  DEFAULT_KMS_KEY_ID = "alias/credstash".freeze
+
   attr_reader :data_key, :hmac_key, :wrapped_key
 
-  def self.generate(client: Aws::KMS::Client.new, context: {})
+  def self.generate(client: Aws::KMS::Client.new, kms_key_id: nil,
+                    context: {})
     res = client.generate_data_key(
-      key_id: 'alias/credstash',
+      key_id: kms_key_id || DEFAULT_KMS_KEY_ID,
       number_of_bytes: 64,
       encryption_context: context
     )
