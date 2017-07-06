@@ -6,6 +6,13 @@ module CredStash::Repository
     case CredStash.config.storage
     when :dynamodb
       DynamoDB.new
+    when :dynamodb_local
+      endpoint = ENV['DYNAMODB_URL'] || 'http://localhost:8000'
+      DynamoDB.new(
+        client: Aws::DynamoDB::Client.new(
+          endpoint: endpoint,
+        )
+      )
     else
       raise ArgumentError, "Unknown storage #{CredStash.config.storage}"
     end
