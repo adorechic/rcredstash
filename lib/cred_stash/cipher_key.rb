@@ -1,3 +1,5 @@
+require 'aws-sdk-kms'
+
 class CredStash::CipherKey
   DEFAULT_KMS_KEY_ID = "alias/credstash".freeze
 
