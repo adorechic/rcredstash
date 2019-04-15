@@ -56,11 +56,7 @@ module CredStash::Repository
     end
 
     def list
-      @client.scan(
-        table_name: CredStash.config.table_name,
-        projection_expression: '#name, version',
-        expression_attribute_names: { "#name" => "name" },
-      ).items.map do |item|
+      fetch_all_items.map do |item|
         Item.new(name: item['name'], version: item['version'])
       end
     end
@@ -91,6 +87,27 @@ module CredStash::Repository
           write_capacity_units: 1,
         },
       )
+    end
+
+    private
+
+    def fetch_all_items
+      all_items = []
+      last_key = nil
+      loop do
+        response = @client.scan(
+          table_name: CredStash.config.table_name,
+          projection_expression: "#name, version",
+          expression_attribute_names: { "#name" => "name" },
+          exclusive_start_key: last_key
+        )
+
+        all_items += response.items
+
+        last_key = response.last_evaluated_key
+        break if last_key.nil?
+      end
+      all_items
     end
   end
 end
