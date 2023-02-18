@@ -1,7 +1,7 @@
 module CredStash
   class << self
-    def get(name, context: {}, raise_if_missing: false)
-      secret = Secret.find(name, context: context)
+    def get(name, context: {}, raise_if_missing: false, version: nil)
+      secret = Secret.find(name, context: context, version: version)
 
       if secret.falsified?
         raise "Invalid secret. #{name} has falsified"
@@ -22,6 +22,12 @@ module CredStash
 
     def list
       Repository.instance.list.inject({}) {|h, item| h[item.name] = item.version; h }
+    end
+
+    def list_with_version
+      Repository.instance.list.inject([]) do |h, item|
+        h.push("#{item.name} --version: #{item.version}")
+      end
     end
 
     def delete(name)

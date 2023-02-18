@@ -4,20 +4,28 @@ module CredStash::Repository
       @client = client || Aws::DynamoDB::Client.new
     end
 
-    def get(name)
-      select(name, limit: 1).first.tap do |item|
-        unless item
-          raise CredStash::ItemNotFound, "#{name} is not found"
+    def get(name, version: nil)
+      if version
+        select(name, limit: 1, version: version).first.tap do |item|
+          unless hash
+            raise CredStash::ItemNotFound, "#{name} --version: #{version} is not found"
+          end
+        end
+      else
+        select(name, limit: 1).first.tap do |item|
+          unless item
+            raise CredStash::ItemNotFound, "#{name} is not found"
+          end
         end
       end
     end
 
-    def select(name, pluck: nil, limit: nil)
+    def select(name, pluck: nil, limit: nil, version: nil)
       params = {
         table_name: CredStash.config.table_name,
         consistent_read: true,
         key_condition_expression: "#name = :name",
-        expression_attribute_names: { "#name" => "name"},
+        expression_attribute_names: { "#name" => "name" },
         expression_attribute_values: { ":name" => name }
       }
 
@@ -28,6 +36,12 @@ module CredStash::Repository
       if limit
         params[:limit] = limit
         params[:scan_index_forward] = false
+      end
+
+      if version
+        params["key_condition_expression"] = "#name = :name AND #version = :version"
+        params[:expression_attribute_names]["#version"] = "version"
+        params[:expression_attribute_values][":version"] = version
       end
 
       @client.query(params).items.map do |item|

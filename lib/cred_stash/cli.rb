@@ -3,8 +3,13 @@ require 'thor'
 module CredStash
   class CLI < Thor
     desc "get [key name]", "Show a value for key name"
+    method_option :version, type: :string, aliases: '-v', desc: 'Specify version'
     def get(name)
-      puts CredStash.get(name)
+      if options[:version]
+        puts CredStash.get(name, version: options[:version])
+      else
+        puts CredStash.get(name)
+      end
     end
 
     desc "put [key name]", "Put a value for key name"
@@ -17,8 +22,13 @@ module CredStash
     end
 
     desc "list", "Show all stored keys"
-    def list
-      puts CredStash.list.keys
+    method_option :version, type: :boolean, aliases: '-v', desc: 'Show version.'
+    def list()
+      if options[:version]
+        puts CredStash.list_with_version
+      else
+        puts CredStash.list.keys
+      end
     end
 
     desc "delete [key name]", "Delete a key"
