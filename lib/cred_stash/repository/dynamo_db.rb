@@ -5,15 +5,11 @@ module CredStash::Repository
     end
 
     def get(name, version: nil)
-      if version
-        select(name, limit: 1, version: version).first.tap do |item|
-          unless hash
+      select(name, limit: 1, version: version).first.tap do |item|
+        unless item
+          if version
             raise CredStash::ItemNotFound, "#{name} --version: #{version} is not found"
-          end
-        end
-      else
-        select(name, limit: 1).first.tap do |item|
-          unless item
+          else
             raise CredStash::ItemNotFound, "#{name} is not found"
           end
         end

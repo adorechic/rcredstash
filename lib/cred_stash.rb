@@ -26,14 +26,16 @@ module CredStash
 
     def list_with_version
       Repository.instance.list.inject([]) do |h, item|
-        h.push("#{item.name} --version: #{item.version}")
+        h.push({
+          "name" => item.name,
+          "version" => item.version
+        })
       end
     end
 
-    def delete(name)
-      # TODO needs delete target version option
+    def delete(name, version: nil)
       repository = Repository.instance
-      item = repository.select(name).first
+      item = repository.select(name, version: version).first
       repository.delete(item)
     end
 
