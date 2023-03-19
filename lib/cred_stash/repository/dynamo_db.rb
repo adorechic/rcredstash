@@ -17,28 +17,7 @@ module CredStash::Repository
     end
 
     def select(name, pluck: nil, limit: nil, version: nil)
-      params = {
-        table_name: CredStash.config.table_name,
-        consistent_read: true,
-        key_condition_expression: "#name = :name",
-        expression_attribute_names: { "#name" => "name" },
-        expression_attribute_values: { ":name" => name }
-      }
-
-      if pluck
-        params[:projection_expression] = pluck
-      end
-
-      if limit
-        params[:limit] = limit
-        params[:scan_index_forward] = false
-      end
-
-      if version
-        params["key_condition_expression"] = "#name = :name AND #version = :version"
-        params[:expression_attribute_names]["#version"] = "version"
-        params[:expression_attribute_values][":version"] = version
-      end
+      params = set_params(name, pluck: pluck, limit: limit, version: version)
 
       @client.query(params).items.map do |item|
         Item.new(
@@ -118,6 +97,32 @@ module CredStash::Repository
         break if last_key.nil?
       end
       all_items
+    end
+
+    def set_params(name, pluck: nil, limit: nil, version: nil)
+      params = {
+        table_name: CredStash.config.table_name,
+        consistent_read: true,
+        key_condition_expression: "#name = :name",
+        expression_attribute_names: { "#name" => "name" },
+        expression_attribute_values: { ":name" => name }
+      }
+      if pluck
+        params[:projection_expression] = pluck
+      end
+
+      if limit
+        params[:limit] = limit
+        params[:scan_index_forward] = false
+      end
+
+      if version
+        params[:key_condition_expression] = "#name = :name AND #version = :version"
+        params[:expression_attribute_names]["#version"] = "version"
+        params[:expression_attribute_values][":version"] = version
+      end
+
+      params
     end
   end
 end
