@@ -175,4 +175,26 @@ describe CredStash::Repository::DynamoDB do
       described_class.new(client: stub_client).delete(item)
     end
   end
+
+  describe '#set_params' do
+    dynamo_db = CredStash::Repository::DynamoDB.new
+    it 'pluck' do
+      result = dynamo_db.send(:set_params, "test", pluck: "1")
+      expect(result).to include(:projection_expression => "1")
+    end
+
+    it 'limit' do
+      result = dynamo_db.send(:set_params, "test", limit: "1")
+      expect(result).to include(:limit => "1", :scan_index_forward => false)
+    end
+
+    it 'version' do
+      result = dynamo_db.send(:set_params, "test", version: "1")
+      expect(result).to include(
+        :key_condition_expression => "#name = :name AND #version = :version",
+        :expression_attribute_names => {"#name" => "name", "#version" => "version"},
+        :expression_attribute_values => {":name" => "test", ":version" => "1"}
+      )
+    end
+  end
 end

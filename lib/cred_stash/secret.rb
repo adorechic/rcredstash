@@ -29,8 +29,8 @@ class CredStash::Secret
   end
 
   class << self
-    def find(name, context: {})
-      item = repository.get(name)
+    def find(name, context: {}, version: nil)
+      item = repository.get(name, version: version)
       new(
         name: name,
         key: CredStash::CipherKey.decrypt(Base64.decode64(item.key), context: context),
