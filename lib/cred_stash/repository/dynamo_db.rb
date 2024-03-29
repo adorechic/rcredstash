@@ -1,7 +1,7 @@
 module CredStash::Repository
   class DynamoDB
     def initialize(client: nil)
-      @client = client || Aws::DynamoDB::Client.new
+      @client = client || CredStash.config.dynamo_client
     end
 
     def get(name, version: nil)
