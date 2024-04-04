@@ -1,4 +1,4 @@
-# RCredStash [![Build Status](https://travis-ci.org/adorechic/rcredstash.svg?branch=master)](https://travis-ci.org/adorechic/rcredstash)
+# RCredStash ![Build Status](https://github.com/adorechic/rcredstash/actions/workflows/ruby.yml/badge.svg)
 
 RCredStash is a ruby port of [CredStash](https://github.com/fugue/credstash)
 
