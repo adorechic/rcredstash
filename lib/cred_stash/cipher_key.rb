@@ -5,7 +5,7 @@ class CredStash::CipherKey
 
   attr_reader :data_key, :hmac_key, :wrapped_key
 
-  def self.generate(client: Aws::KMS::Client.new, kms_key_id: nil,
+  def self.generate(client: CredStash.config.kms_client, kms_key_id: nil,
                     context: {})
     res = client.generate_data_key(
       key_id: kms_key_id || DEFAULT_KMS_KEY_ID,
@@ -19,7 +19,7 @@ class CredStash::CipherKey
     )
   end
 
-  def self.decrypt(wrapped_key, client: Aws::KMS::Client.new, context: {})
+  def self.decrypt(wrapped_key, client: CredStash.config.kms_client, context: {})
     res = client.decrypt(ciphertext_blob: wrapped_key, encryption_context: context)
     new(
       data_key: res.plaintext[0...32],

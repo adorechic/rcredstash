@@ -56,6 +56,10 @@ RCredStash uses [aws-sdk v2](https://github.com/aws/aws-sdk-ruby), so configurat
 ```ruby
 CredStash.configure do |config|
   config.table_name = 'your_dynamodb_table_name'
+
+  # Optional, if you want to modify them, like for Localstack.
+  config.dynamo_client = Aws::DynamoDB::Client.new
+  config.kms_client = Aws::KMS::Client.new
 end
 ```
 
